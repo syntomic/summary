@@ -1,0 +1,14 @@
+- Pipenv：基于pip的Python包管理工具
+    - 包安装：pip
+    - 包依赖管理：Pipfile
+    - 虚拟环境：Virtualenv
+- 安装
+    - pip：`python get-pip.py`
+    - Pipenv(集成Virtualenv)：`pip install pipenv`
+- 创建虚拟环境
+    - 创建：`pipenv install`
+    - 激活：`pipenv shell`
+    - 退出：`exit`
+- 管理依赖
+    - Pipfile：记录项目依赖包列表
+    - Pipfile.lock：固定版本的详细依赖包列表

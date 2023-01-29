@@ -1,0 +1,60 @@
+- 历史
+    - 静态Web界面
+    - Common Gateway Interface(CGI): 处理用户发送的动态数据, C/C++编写
+    - ASP/JSP/PHP: 脚本语言开发效率高
+    - MVC: 提升可维护性
+    - 异步, MVVM
+    - Web框架, ORM框架, 模板引擎, 测试框架, 构建工具
+
+- 安装Node.js和npm
+    - 官网下载的文件已经编译,只需添加环境变量
+- 文本编辑器 vs IDE
+- Hello world
+    - hello.js:`console.log('Hello, world!')`
+    - 运行:`node hello.js` 
+- 模块管理: npm vs yarn
+    - 项目描述文件:`package.json`
+    - 所有依赖包:`node_modules/`
+    - 模块加载机制: CommonJS
+        - 对外暴露对象:`module.exports = object`
+        - 引用暴露对象:`var ref = require('module_name')`
+- 基本模块:全局对象`global` 当前进程`process`
+    - 读写文件:`fs`
+        - 异步:`fs.readFile(filename, 'utf-8')`
+        - 同步:`fs.writeFileSync(filename, data)`
+        - 文件状态:`fs.stat(filename)`
+    - 流数据结构:`stream`
+        - 打开数据流:`rs = fs.createReadStream(filename, 'utf-8')`
+        - 响应流事件: `data` `end` `error`
+        - 写入数据流:`ws = fs.createWriteStream(filename, 'utf-8')`
+        - 管道: `rs.pipe(ws)`
+    - Http协议:`http`
+        - 创建服务器:`server = http.createServer(function (request, response) {})`
+        - 监听端口:`server.log(8000)`
+    - 加密算法:`crypto`
+        - MD5和SHA1:`crypto.createHash('md5')`
+        - Hmac:`crypto.createHmac('sha256', 'secret-key')`
+        - AES: `crypto.createCiper('aes192', key)` + ...
+        - Diffie-Hellman:`crypto.createDiffHellman(512)`
+        - RSA:`openssl`
+- Web开发
+    - web框架:`koa2`
+        - 异步: `async` + `await`
+        - 模板引擎:`Nunjucks`
+        - MVC: Model-View-Controller
+    - 数据库: `mysql`
+        - ORM:`Sequelize`
+        - 建立Model
+    - 单元测试:`mocha`
+        - 异步测试: `await-test.js`
+        - Http测试: `start.js`
+    - WebSocket: `ws` 浏览器和服务器之间建立一个不受限的双向通信的通道 
+        - GET请求:`ws://`
+        - 请求头:`Upgrade: websocket` `Connection: Upgrade`
+        - 标识连接:`Sec-WebSoket-Key`
+        - 协议版本:`Sec-WebSoket-Version`
+    - REST:设计API的模式 `Content-Type: application/json`
+        - REST请求: 获取`GET` 新建`POST` 更新`PUT` 删除`DELETE` 
+        - REST响应
+    - MVVM: `Vue.js` 连接Model与DOM
+    - 自动化工具:`webpack` 模块打包器

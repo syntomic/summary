@@ -1,0 +1,15 @@
+## 常用工具
+- shell
+    - oh-my-zsh
+- 版本控制
+    - [Git](git.md)
+- 包管理器
+    - pip + virtualenv + requirements.txt
+    - [pipenv](pipenv.md)
+- 编辑
+    - [Markdown](markdown.md): 轻量级标记语言(GitHub Flavored)
+    - [Vim](vim.md): 功能强大、高度可定制的文本编辑器
+    - Latex
+    - [Vscode](vscode.pdf): 轻量级, 功能强大, 支持全平台的IDE
+- 虚拟技术
+    - [Docker](docker.md): 应用容器引擎, 轻量级 可移植的容器

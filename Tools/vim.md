@@ -1,0 +1,21 @@
+## Vim 程序编辑器
+- 模式 ![Vim](/PNG/vim.PNG)
+    - command mode
+    - insert mode
+    - command-line mode
+- 主动建立swap暂存档
+- 常用按键 ![vim2](/PNG/vim2.PNG)
+    - 数字+指令：重复几次动作 `5yy`
+    - 光标的移动：`1G`(头) `G`(尾)
+    - 复原：`u`
+    - 重复前一次动作：`.` 
+    - 区块选择：`v`
+    - 多文件编辑：`:files`
+    - 分区窗口：`:sp`
+    - 补全：`Ctrl+x`+`Ctrl+o`
+    - 冻结(解冻)：`Ctrl+s`(`Ctrl+q`)
+- 环境设置`~/.vimrc`:`set nu` 
+- DOS 与 Linux的断行字符
+    - CRLF: `^M$` vs LF:`$`
+    - 转换：`unix2dos` `dos2unix`
+- 语系编码：`iconv`

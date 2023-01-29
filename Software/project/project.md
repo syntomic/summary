@@ -1,0 +1,137 @@
+- python：动态语言，注重规范
+    - 网站
+    - 运维
+    - 数据分析
+    - 爬虫
+    - AI
+    - 量化投资
+- 计算机网络：[从输入URL 到页面加载完成的过程中都发生了什么事情](http://fex.baidu.com/blog/2014/05/what-happen/)
+    - REST
+        - 客户端-服务端
+        - 无状态
+        - 可缓存
+        - 分层系统
+        - 统一的接口
+        - 按需编码 
+    - 框架
+        - django
+        - flask
+        - tornado
+- Web服务器：LNMP docker
+- 业务领域知识
+- 专业素养：正规python项目
+- 系统设计
+    - 大数据存储
+    - 消息队列
+    - 分布式
+    - 缓存
+    - 并发优化
+    - 软件工程
+- 工程实践
+    - 技术雷达：小组内部(统一)
+    - 代码风格：PEP8 + docstring
+        - 元编程
+    - 编程范式：`import this` OOP vs Procedural vs Functional
+        - OOP：SOLID
+            - Single-Responsibility Principle
+            - Open-Closed Principle
+            - Liskov Substitution Principle
+            - Interface Segregation Principle
+            - Dependence Inversion Principle
+            - Law of Demeter
+            - Composite/Aggregate Reuse Principle 
+    - 敏捷与TDD
+    - 规范：控制复杂度并且快速响应
+        - 可读性第一
+        - KISS：Keep It Simple, Stupid
+        - DRY：Don't Repeat Yourself
+        - YAGNI：You Aren't Gonna Need It
+        - SLAP：Single Level of Abstraction Principle
+        - Clean Coder Rule
+        - 最少惊讶原则：让代码的副作用尽量最小或没有
+        - 快速失败，灵活使用断言
+        - 增量式编程哭
+        - 隐藏复杂性
+        - Do one thing and do it well
+        - 高内聚、低耦合、模块化、层次化
+        - 不要过早优化，最小可用原则：二八定律
+        - 自动化
+        - 演进型架构
+        - 文档化
+        - 服务化：拆分业务
+        - 记录异常发生的信息
+        - 墨菲定律：有错误发生的可能性，就一定会发生
+        - 单元测试：F.I.R.S.T
+        - Unix哲学
+    - 异常处理
+    - 日志
+    - ORM和数据库相关
+    - 线程安全
+    - 代码优化
+        - 批量：数据库一次获取多条数据/redis pipeline
+        - 缓存：注意缓存失效问题
+        - 异步：celery消息队列或异步框架
+        - 并发：gevent、多线程 + gunicorn
+        - 多线程/多进程：I/O密集 vs CPU密集
+    - 重视细节
+        - 版式与布局
+        - 命名
+            - joined_lower for functions, methods, attributes
+            - ALL_CAPS for constant
+            - StudlyCaps for classes
+        - 注释与docstring
+        - 异常处理
+            - Syntax Error
+            - Logic Error
+            - Runtime Error
+        - 安全
+- 项目
+    - 文档化
+        - 统一
+            - 统一需求/开发文档
+            - 统一代码规范
+            - 统一环境
+        - Readme Driven Development
+            - Explain the system's pupose
+            - Describe the scope
+            - Summarise what it does
+    - 代码分支与代码管理
+        - 代码提交
+        - Code Review
+        - **日志与异常处理**
+        - 调试
+            - 复现：sentry
+            - bug总结
+        - 重构与维护
+    - 开发习惯：`think more, type less`
+        - 认识和熟悉所在团队中的成员
+        - 确保需求，理解业务
+        - 番茄工作法
+        - 善用工具
+        - 结对编程
+- 效率工具
+    - vim
+    - pipenv
+    - gitlab
+    - devops
+    - RPC
+    - Rest
+
+- 设计模式：`I have run out of language`
+    - 工厂模式：解决对象创建问题
+    - 构造模式：控制复杂对象的构造
+    - 原型模式：解决对象拷贝问题
+    - 适配器模式：解决接口不兼容问题
+    - 装饰器模式：无需子类化实现扩展对象功能
+    - 外观模式：简化复杂对象的访问问题
+    - 亨元模式：实现对象复用从而改善资源使用
+    - MVC模式：解耦展示逻辑和业务逻辑
+    - 代理模式：通过一层间接保护层实现更安全的接口访问
+    - 责任链模式：创建链式对象用来接收广播消息
+    - 命令模式：用来给应用添加Undo操作
+    - 解释器模式：用来实现DSL
+    - 发布订阅模式：用来处理多个对象之间的发布订阅问题
+    - 状态模式：实现有限状态机
+    - 策略模式：动态选择算法策略
+    - 模板模式：抽象出算法公共部分实现代码复用
+    - 单例模式

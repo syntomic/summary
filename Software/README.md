@@ -1,0 +1,85 @@
+## 软件开发
+- 分类
+    - 客户端开发
+    - 移动终端开发
+        - IOS: swift
+        - Android: kotlin
+    - 测试开发
+    - 嵌入式开发
+    - 游戏开发
+    - Web开发
+        - [基础](front/basic.md)
+            - HTML: 定义了网页的内容
+            - CSS: 描述了网页的布局
+            - [JavasSript](https://github.com/syntomic/Languages_and_Algorithms/tree/master/languages/javascript/): 控制网页的行为
+        - 框架
+            - 前端
+                - Vue.js
+                - [BootStrap](front/bootstrap.md)
+            - 后端
+                - JavaScript: 单线程,只能使用异步IO
+                    - Node.js: 事件驱动+V8高性能引擎
+                        - 统一语言
+                        - 速度快
+                - python
+                    - [Flask](https://github.com/syntomic/WebApp/tree/master/backend/flask/)
+                        - 需要保存请求相关的信息->有了请求上下文
+                        - 为了更好地分离程序的状态,应用起来更加灵活->有了程序上下文
+                        - 为了上下文对象可以在全局动态访问,而不用显式地传入试图函数,同时确保线程安全->有了LocalStack
+                        - 为了支持动态获取上下文对象->有了LocalProxy
+                        - ...
+                        - 为了让这一切愉快的工作在一起->有了Flask
+                    - [Python工程实践](project/project.md)
+                - 相关组件
+                    - 消息队列
+                        - Kafka
+                    - 搜索引擎
+                        - ElasticSearch
+                    - Web服务器
+                        - [Nginx](project/nginx.md)
+        - 安全
+            - [加密](project/ssh.md)
+            - 攻击
+                - 注入攻击
+                - XSS
+                - CRSF
+                - DoS
+        - [架构设计](project/basic.md)
+            - 前端架构
+            - 应用层架构
+            - 服务层架构
+            - 存储层架构
+            - 后台架构
+            - 数据中心机房架构
+- [数据库](https://github.com/syntomic/WebApp/tree/master/database/)
+    - RDBMS
+        - 特点
+            - 完备的数学理论基础
+            - 完善的事务管理机制
+            - 高效的查询处理引擎
+        - 基石
+            - ACID
+            - SQL
+    - NoSQL
+        - 特点
+            - 灵活的可扩展性
+            - 灵活的数据模型
+            - 与云计算紧密融合
+        - 基石
+            - CAP
+            - BASE
+            - 最终一致性
+    - 实例
+        - MySQL: 关系型数据库
+        - MongoDB: 文档型数据库
+        - Redis: 基于内存的键-值数据库
+        - Neo4j: 图数据库
+- 软件工程
+    - 可行性分析
+    - 需求分析
+    - 概要设计
+    - 详细设计
+    - 编码
+    - 测试
+    - 部署
+    - 维护

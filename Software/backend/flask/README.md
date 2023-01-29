@@ -1,0 +1,767 @@
+<p align="right">参考 Flask Web开发实战 李辉</p>
+
+## 基础篇
+- 初识Flask：Pyhton编写的Web微框架，Werkzeug+Jinja2+扩展
+    - 搭建开发环境
+        - Pipenv工作流：虚拟环境+管理依赖
+        - 安装Flask
+        - IDE
+    - Hello, Flask!
+        ```python
+        from flask import Flask
+        app = Flask(__name__)
+
+        @app.route('/')
+        def index():
+            return '<h1>Hello Flask!<h1>'
+        ```
+        - 程序实例：`app`
+        - 路由(route)+视图(view)
+            - 视图绑定多个URL：多个装饰器
+            - 动态URL:`<name>` + 设置默认值
+    - 启动开发服务器: `Werkzeug`
+        - 启动(Click)： `flask run`
+            - 自动发现程序实例：当前目录寻找`app.py`或环境变量`FLASK_APP`
+            - 管理环境变量(`python-dotenv`)：`.flaskenv`(公开)+`.env`(敏感)
+        - 更多启动选项
+            - 使服务器外部可见(`FLASK_RUN_HOST`)(内网穿透/端口转发工具): `--host=0.0.0.0`(局域网)
+            - 改变默认端口(`FLASK_RUN_PORT`): `--port`
+        - 设置运行环境(`FLASK_ENV`)：development vs production 
+            - 调试器：debugger + PIN
+            - 重载器: `pipenv install Watchdog --dev`
+    - Python Shell: `flask shell`(程序上下文以及程序实例)
+    - Flask扩展: `from flask-foo import Foo` + `Foo(app)`
+    - 项目配置: `app.config['ADMIN_NAME'] = 'Hugh'`
+    - URL与端点: `url_for(endpoint, **kw)`(相对url)
+    - Flask命令: `@app.cli.command()`
+    - 模板(template)和静态文件(static): 本地 vs CDN
+    - Flask与MVC架构
+        - 视图(View)：Jinja2渲染的HTML模板
+        - 控制器(Controller)：视图函数
+        - 模型(Model)：其他库(SQLAlchemy)
+- Flask和HTTP：与www中数据交互的基础 
+    - 请求响应循环 ![HTTP](../../PNG/HTTP.png)
+    - HTTP请求
+        - 请求报文
+            - 报文首部：请求行(方法、URL、协议)
+            - 报文首部：Requst Headers
+            - 空行
+            - 报文主体：body
+        - Request对象：`flask.request`(Werkzurg的请求子类化)
+            - URL：`request.url`
+            - 参数：`request.args`
+            - cookies：`request.cookies`
+            - 客户端：`request.user_agent`
+        - 在Flask中处理请求
+            - 路由匹配: `app.url_map()`或`flask routes`
+            - 甚至监听的HTTP方法: `@app.route('/', methods='GET')`
+            - URL处理：转换器`/<int:year>`
+            - 请求钩子：预处理(`@app.before_request`)和后处理(`@app.after_request`) ![Hook](../../PNG/hook.png)
+    - HTTP响应
+        - 响应报文
+            - 报文首部：状态行(协议、状态码、原因短语)
+            - 报文首部：Response Header
+            - 空行
+            - 报文主体：Response Body
+        - 在Flask中生成响应：`make_response()`
+            - 重定向：`redirect()`
+            - 错误响应：`abort()`
+        - 响应格式(MIME)：`response = flask.make_response(body)`+ `response.mimetype(text/plain)`
+            - 纯文本：`text/plain`
+            - HTML：`text/html`
+            - XML：`application/xml`
+            - JSON：`application/json`(`jsonify`)
+        - 来一块Cookie: `response.set_cookie()`
+        - Flask中session: 安全的Cookie，保证不被修改，但依然可以轻易读取
+            - 设置程序密钥： `SECRET_KEY`
+            - 模拟用户认证：`session['logged_in'] = True`
+            - 有效时长:`PERMANENT_SESSION_LIFETIME`
+        - Flask上下文(当前环境的快照): 程序上下文 vs 请求上下文
+            - 上下文全局变量：`thread local`将请求对象在特定的线程和请求中全局可访问, 代理对象, 真实对象`._get_current_object()`
+                - 程序上下文：`current_app` `g`
+                - 请求上下文：`request` `session`
+            - 激活上下文
+                - 程序上下文：flask命令或`app.app_context()`
+                - 请求上下文：请求进入或`app.test_request_context()`
+            - 上下文钩子: `@app.teardown_appcontext`
+    - HTTP进阶实践
+        - 重定向回上一个页面
+            - 获取上一个页面的URL
+                - HTTP referer: `request.referrer`
+                - 查询参数：`next`
+                - 综合：`redirect_back()`
+            - 对URL进行安全验证：`is_safe_url()`
+        - 使用AJAX技术发送异步请求(XMLHttpRequest)
+            - 认识AJAX: 异步Javascript和XML
+            - 使用jQuery发送AJAX请求: `ajax()`
+            - 返回"局部数据":`$.ajax(**kwargs)`
+                - 纯文本或局部HTML模板
+                - JSON数据
+                - 空值
+                - 异步加载长文章
+        - HTTP服务器推送
+            - 传统轮询
+            - 长轮询
+            - SSE：HTML5中的EventSource API
+            - WebSocket: TCP协议的双全工通信协议
+        - Web安全防范：永远不要相信你的用户 `OWASP Top10` `CWE Top25`
+            - 注入攻击 
+                - 攻击原理：SQL注入
+                - 防范方法：ORM
+            - XSS攻击
+                - 攻击原理：恶意脚本
+                - 防范方法：HTML转义
+            - CSRF攻击
+                - 攻击原理：利用cookie伪造请求
+                - 防范方法：CSRF令牌校验`token`
+                    - 表单的隐藏字段和session变量
+            - 其他
+                - 文件上传漏洞
+                - 敏感数据存储
+                - 用户认证与权限管理
+- 模板引擎(Jinja2)：渲染
+    - 基本用法
+        - 创建模板
+            - 语句：`{% ... %}`
+            - 表达式：`{{ ... }}`
+            - 注释：`{# ... #}`
+        - 模板语法：添加结束标签
+        - 渲染模板：`render_template('index.html', **kw)`
+    - 模板辅助工具
+        - 上下文
+            - 模板中定义变量：`{% set %}`
+            - 内置上下文变量：`request` `config` `session` `g`
+            - 自定义上下文：`@app.context_processor`
+        - 全局对象
+            - 内置全局函数：`lipsum()`,`url_for()` `get_flashed_messages()`
+            - 自定义全局函数：`@app.template_global()`
+        - 过滤器：修改和过滤变量值的特殊函数，自动转义
+            - 内置过滤器：`{{ name|title }}` `{{ text|safe }}`
+            - 自定义过滤器：`@app.template_filter()`
+        - 测试器
+            - 内置测试器：`{% if age is number %}`
+            - 自定义测试器：`@app.template_test()`
+        - 模板环境对象
+            - 添加自定义全局对象：`app.jinjia_env.gloabals['foo']=foo`
+            - 添加自定义过滤器：`app.jinja_env.filters['smiling'] = smiling`
+            - 添加自定义测试器：`app.jinja_env.tests['baz'] = baz`
+    - 模板组织结构：DRY
+        - 局部模板：`{ include '_banner.hrml' %}`
+        - 宏：方便代码块的重用
+            - 创建(`_macros.html`): `{% macro name(*args, **kw) %}` 
+            - 导入：`{% from '_macros.html' import name <with context> %}` + `{{ name(*args, **kw)}}`
+        - 模板继承
+            - 编写基模板：`{% block body%} ... {% endblock body %}`
+            - 编写子模板：`{% extends 'base.html' %}`
+                - 覆盖
+                - 追加：`{{ super() }}`
+    - 进阶
+        - 空白控制：实际输出的HTML文件中，模板中的Jinja2语句会保留移除后的空行
+            - `app.jinja_env.trim_blocks`
+        - 加载静态文件：`url_for('static', filename=' ')`
+            - 添加Favicon
+            - 使用CSS框架：Bootstrap
+            - 使用宏加载静态资源
+        - 消息闪现：`flash()`+`get_flashed_messages()`
+        - 自定义错误页面：`@app.errorhandler(404)`
+        - JavaScript和CSS中的Jinja2
+            - 行内/嵌入式JavaScript/CSS：维护变得困难
+            - HTML元素`data-*`属性存储: `$element.data('*')`
+            - 定义为JavaScipt/CSS变量: `var(--theme-color)`
+            - Web API
+- 表单
+    - HTML表单: `<form method='POST'> <label> <input >`
+    - 使用Flask-WTF处理表单：自动启用CSRF保护
+        - 定义WTForms表单类(Form类)：`username = StringField(label, validators=[DataRequired(),], **kw)`
+        - 使用Flask-WTF：继承FlaskForm类
+        - 输出HTML代码，添加额外属性
+            - 使用reder_kw属性：`reder_kw={'placeholder':'your username'}`
+            - 在调用字段时传入：`form.username(style='', class_='bar')`
+        - 在模板中渲染表单：`{{ form.csrf_token }}`
+            - Bootstrap风格：`.form-group .form-check` + `.form-control .form-check-input .btn btn-primary`
+    - 处理表单数据
+        - 提交表单，控制提交行为的属性
+            - 提交发送请求的目标URL：`action`
+            - 请求方法：`method`
+            - 表单数据的编码类型：`enctype='application/x-www-form-urlencoded'`
+        - 验证表单数据
+            - 客户段验证和服务器端验证
+                - 客户端验证：`{{ form.username(required='') }}`
+                - 服务器端验证：`validators`
+            - WTForms验证机制：将`request.form`传入表单类
+            - 在视图函数中验证表单：`form.validate_on_submit()` + `redirect()`(PRG)
+        - 在模板中渲染错误消息：`{{ form.username.errors }}`
+    - 进阶
+        - 设置错误消息语言：`MyForm(meta={'locales': ['zh', 'en']})`
+        - 使用宏渲染表单：`{% macro form_field(field) %}`
+        - 自定义验证器
+            - 行内验证器(类方法)：`def validate_answer(form, field):`
+            - 全局验证器： 工厂函数，实现`__call__`方法
+        - 文件上传: `Flask-Uploads` `Flask-Transfer`
+            - 定义上传表单: `UploadForm()`
+                - 文件类型：`FileAllowed(upload_set)` `FileRequired()`
+                - 文件大小:`MAX_CONTENT_LENGTH`
+            - 渲染上传表单：`<form method="post" enctype="multipart/form-data">`
+            - 处理上传文件: `request.files`
+                - 文件名:`form.photo.data`
+                    - 原文件名：确保文件的来源安全前提下
+                    - 过滤(非ASCII字符)后的文件名：`secure_filename(filename)`
+                    - 统一重命名：`uuid.uuid4().hex`(十六进制字符串)
+                - 返回上传后的文件：`send_from_directory(path, filename)`
+                - 展示上传后的图片：`redirect(url_for('show_images'))`
+        - 多文件上传：`MultipleFileField()`(Flask-WTF>0.14.2)
+        - 使用Flask-CKEditor集成富文本编辑器
+        - 单个表单多个提交按钮：`if form.save.data`
+        - 单个页面多个表单
+            - 单视图处理
+            - 多视图处理
+- 数据库
+    - 数据库的分类
+        - SQL
+        - NoSQL
+        - 如何选择：使用MySQL作为主数据库存储用户资料和文章,使用Redis(键值对型数据库)缓存数据,使用MongoDB(文档型数据库)存储实时消息
+    - ORM魔法：表$\rightarrow$ Python类, 字段(列)$\rightarrow$ 类属性，记录(行)$\rightarrow$ 类实例
+    - 使用Flask-SQLAlchemy管理数据库：`db = SQLAlchemy(app)`
+        - 连接数据库服务器：URI
+            - `SQLALCHEMY_DATABASE_URI=mysql+pymysql://username:password@host/databasename`
+        - 定义数据库模型(model): 子类化`db.Model`
+            - 生成表名：`__tablename__` 或 生成规则
+        - 创建数据库和表:`db.create_all()`
+            - 查看对应的SQL语句：`CreateTable(Note.__table__)`
+        - 数据库操作：CRUD
+            - Create：`db.session.add(note)` + `db.session.commit()`
+            - Read：`<模型类>.query.<过滤方法>.<查询方法>`
+            - Update：直接赋值
+            - Delete：`db.session.delete(note)`
+        - 在视图函数里操作数据库
+            - 获取表单的字段值作为提交到数据库的数据
+            - 查询结果作为参数传入模板
+            - 删除结果采用POST方法
+    - 定义关系
+        - 配置Python Shell上下文：`@app.shell_context_processor`
+        - 一对多
+            - 定义外建：`db.ForeignKey('author_id')`
+            - 定义关系属性：`db.relationship('Article')`
+            - 建立关系: `foo.articles.append(ham)`
+            - 建立双向关系：`db.relationship('', back_populates='')`
+            - 使用backref简化关系定义
+        - 多对一
+        - 一对一：`uselist=False`
+        - 多对多: `secondary=association_table`
+    - 更新数据库表
+        - 重新生成表：开发环境
+        - 使用Flask-Migrate迁移数据库(Alembic)：生产环境
+            - 创建迁移环境
+            - 生成迁移脚本
+            - 更新数据库
+        - 开发时是否需要迁移
+    - 进阶
+        - 级联操作：`cascade`
+        - 事件监听：`@db.event.listens_for(target,identifier)`
+- 电子邮件
+    - 使用Flask-Mail发送电子邮件
+        - 配置Flask-Mail(SMTP):`MAIL_PORT`
+        - 构建邮件数据：`Message(subject='', recipients='', body= )`
+        - 发送邮件：`mail.send()`
+    - 使用事务邮件服务SendGird
+    - 进阶
+        - 提供HTML正文
+        - 使用Jinja2模板组织邮件正文：`_external`
+        - 异步发送邮件：`Celery`异步任务队列
+## 实战编
+- 留言板
+    - 使用包组织代码
+        - 配置文件
+        - 创建程序实例
+            - 构造文件导入模块
+    - Web程序开发流程
+        - 分析需求，列出功能清单或写需求说明书
+        - 设计程序功能，写功能规格书和技术规格书
+            - 概述
+            - 主页
+            - 问候表单
+            - 问候消息列表
+            - 错误页面
+        - 进入开发与测试的迭代
+            - 前端
+                - 根据功能规划书画页面草图
+                - 根据草图做交互原型图
+                    - 原型设计工具：Axure RP, Mockplus
+                - 根据原型图开发前端页面
+            - 后端
+                - 数据库建模
+                - 编写表单类
+                - 编写视图函数和相关的处理函数
+                - 编写模板
+                    - 在页面中使用Jinja2替换虚拟数据
+        - 调试和性能等专项测试
+        - 部署上线
+        - 运行维护与营销等
+    - 使用`Bootstrap-Flask`简化页面编写
+        - 加载资源文件
+        - 快捷渲染表单：`{% from 'bootstrap/form.html' import reder_form%}`
+    - 使用`Flask-Moment`本地化日期和时间
+        - 本地化前的准备：native time 不包含时区信息的时间戳
+        - 集成`Moment.js`
+        - 渲染时间日期
+    - 使用`Faker`生成虚拟数据
+    - 使用`Flask-DebugToolbar`调试程序
+    - Flask配置的两种组织形式
+        - 环境优先变量
+        - 实例文件夹覆盖
+- 个人博客: Content Management System
+    - 大型项目结构
+        - 使用蓝本模块化程序
+            - 蓝本实例：`auth_bp = Bluprint('auth', __name__)`
+            - 装配蓝本
+                - 视图函数：`@auth_bp.route()`
+                - 错误处理函数：`errorhandler()`vs`app_errorhandler`
+                - 请求处理函数：`before_request`vs`before_app_request`
+                - 模板上下文处理函数：`context_processor`vs`app_context_processor`
+            - 注册蓝本:`app.register_blueprint(auth_bp, subdomain='auth')`
+            - 蓝本的路由端点：实现蓝本的视图函数命名空间
+            - 蓝本资源：`auth_bp = Blueprint('auth', __name__,template_folder='templates', static_folder='static')`
+        - 使用类组织配置：`app.config.from_object()`
+        - 使用工厂函数创建程序实例: 创建其他对象的对象
+            - 加载配置
+            - 初始化扩展：`db.init_app(app)`
+            - 组织工厂函数
+            - 启动程序: `FLASK_APP="bluelog:create_app('development')"`
+            - 当前程序实例的代理对象:`current_app`
+    - 编写程序骨架 ![Blog](../../PNG/Blog.png)
+        - 数据库
+            - 创建数据库模型
+                - 管理员
+                - 分类
+                - 文章
+                - 评论
+            - 邻接列表关系
+            - 生成虚拟数据
+                - 创建命令
+        - 模板
+            - 模板上下文
+            - 渲染导航链接
+            - Flash消息分类: `flash(message, 'success')`
+        - 表单
+            - 登陆表单
+            - 文章表单
+            - 分类表单
+            - 评论表单
+        - 视图函数
+        - 电子邮件支持
+    - 编写博客前台
+        - 分类显示文章列表
+            - 获取分页记录
+            - 渲染分页导航部件
+        - 显示文章正文：`get_or_404()`
+        - 文章固定链接:`slug`
+            - 模态对话框: `Modal`
+        - 显示分类文章列表
+        - 显示评论列表
+        - 发表评论与回复
+        - 支持回复评论
+        - 网站主题切换
+    - 初始化博客
+        - 安全存储密码: `generate_password_hash()`
+        - 创建管理员用户
+    - 使用`Flask-Login`管理用户认证
+        - 获取当前用户
+        - 登入用户
+        - 登出用户
+        - 视图保护
+    - 使用CSRFProtect实现CSRF保护
+    - 编写博客后台：`Flask-Admin`
+        - 文章管理
+            - 文章管理主页
+            - 创建文章
+            - 编辑与删除
+        - 评论管理
+            - 关闭评论
+            - 评论审核
+            - 筛选评论
+        - 分类管理        
+- 图片社交网站
+    - 项目组织架构
+        - 功能式架构:各个代表程序组件(功能)的子包组成
+        - 分区式架构:程序被按照自身的板块分成不同的子包
+        - 混合式架构
+        - 如何选择: 功能联系紧密 vs 相对独立
+    - 编写程序骨架
+        - 数据库模型与虚拟数据
+            - 固定图片
+            - 在线占位图片服务: `Lorem Picsum`
+            - 生成随机图片: `pillow`
+        - 模板与静态文件
+            - 图标:`Iconic`
+    - 高级用户认证: `Flask-Security`
+        - 用户注册
+        - 验证邮箱地址
+            - 生成确认令牌
+            - 发送确认邮件
+            - 验证并解析确认令牌
+        - 使用装饰器过滤未确认用户:自定义
+        - 密码重置
+    - 基于用户角色的权限管理: Role-Based Access Control
+        - 角色与权限模型
+        - 设置角色与权限
+        - 写入角色与权限
+        - 验证用户权限
+    - 使用`Flask-Dropzone`优化文件上传
+        - 配置Flask-Dropzone
+        - 渲染上传区域
+        - 处理并保存上传图片
+            - 保存图片
+            - 图片裁剪
+    - 使用`Flask-Avatars`处理用户头像
+        - 默认头像
+        - 生成随机头像
+    - 图片展示与管理
+        - 在用户主页显示图片列表
+        - 图片详情页
+        - 上一张下一张跳转
+        - 删除确认模态框
+        - 举报图片
+        - 图片描述
+        - 图片标签
+            - 编辑标签
+            - 图片排序
+        - 用户资料弹窗
+            - 使用AJAX请求获取用户资料
+            - 显示和隐藏弹窗
+            - 动态显示提示消息
+        - 收藏图片
+            - 使用关联模型表示多对多关系
+            - 添加和取消收藏
+            - 收藏者和收藏页面
+    - 用户关注
+        - 自引用多对多关系
+        - 关注与取消关注
+        - 显示关注用户列表
+        - 使用AJAX在弹窗中执行关注操作
+            - AJAX请求的CSRF保护
+            - 动态更新关注数量
+            - 在服务器返回提示消息 
+    - 消息提醒
+        - 在数据库中的表示
+        - 创建提醒
+        - 显示和管理提醒
+        - 通过轮询实时更新未读计数
+            - 服务器推送事件SSE: `Flask-SSE`
+    - 用户资料与账户设置
+        - 编辑个人资料
+        - 自定义头像
+        - 更改密码
+        - 消息提醒开关
+        - 将收藏设为仅自己可见
+        - 注销账户
+    - 首页与探索
+        - 获取正在关注用户的图片: 查询的数据分布在多个表中
+            - 使用子查询
+            - 使用联结优化查询:`join(target, onclause)`
+        - 使用联结和分组查询获取热门标签
+        - 使用数据库通有函数获取随机图片
+    - 使用`Flask-Whooshee`实现全文搜索
+        - 创建索引
+        - 搜索表单
+        - 显示搜索结果
+    - 编写网站后台
+        - 用户管理
+          - 锁定用户账户
+          - 封禁用户账户
+        - 资源管理
+        - 面向管理员的用户资料编辑 
+- 代办事项程序
+    - 使用JavaScript和AJAX编写单页程序
+        - 单页程序的模板组织: `Materialize`
+            - 根页面
+            - 子页面
+            - 条目模板
+        - 在根页面切换子页面
+        - 生成测试账户
+        - 添加新待办条目
+    - 国际化与本地化
+        - 使用`Flask-Babel`集成Babel
+        - 区域(locale)与语言: 某个国家地区的语言、文字、时区、时间格式、计量单位、货币、标志等
+            - 语言代码和区域代码:`zh-CN` vs `zh_CN`
+            - 设置区域
+            - 显示区域列表
+            - 获取区域
+        - 文本的国际化:对程序中所有需要翻译的文本进行处理(标记文本)
+        - 文本的本地化:为特定的区域构建消息目录(MO/PO)
+    - 设计并编写Web API: 分离客户端和服务端
+        - 客户端实现处理,渲染,验证功能:`Angular` `React` `Vue.js`
+        - 设计并编写Web API
+            - 架构风格: `REST`(资源在网络中以某种表现形式进行状态转移)
+            - 设计: LSUD vs SSKD
+                - 使用URL定义资源:`http://api.example.com`
+                - 使用HTTP方法描述操作: `GET`
+                - 使用JSON交换数据
+                - 设置API版本:`http://api.example.com/v1`
+        - 使用Flask编写Web API
+            - 创建API蓝本
+            - 设置子域: `127.0.0.1 api.example.dev`(host)
+            - 添加(跨域资源共享)CORS支持:`flask-cors`
+            - 设计资源端点
+            - 创建资源类
+        - 使用OAuth认证: `access token` ![OAUTH](../../PNG/OAUTH.png)
+        - 资源的序列化:将数据按照设计好的模式封装为JSON数据并返回
+            - 定义资源模式
+            - 序列化处理
+            - 资源分页
+        - 资源的反序列化
+            - 反序列化处理
+            - 使用`Webargs`解析请求
+            - 处理错误响应
+        - Web API的测试与发布
+            - 使用`HTTPie`测试: 命令行
+            - 发布和壮大: `Sphinx`编写文档
+                - API测试台: Apigee
+                - 软件开发工具SDK: 提供给API使用者的便利工具
+- 在线聊天室
+    - 编写程序骨架
+    - Gravatar头像
+    - 使用`Flask-SocketIO`建立实时双向通信
+        - 建立Socket.IO连接
+            - 启动Socket.IO服务器: 异步服务器
+                - eventlet
+                - gevent
+            - 与客户端建立连接
+        - 一条消息的旅程
+            - 客户端发送消息
+            - 服务器接收消息并广播
+            - 客户端接受消息
+        - 在线人数统计
+        - 通信频道分离: 命名空间和房间
+    - 使用`Flask-OAuthlib`实现第三方登陆
+    - 聊天室功能增强
+        - 无限滚动加载历史消息
+        - Markdown支持
+        - 代码语法高亮:`Pyments`
+        - 标签页消息提醒
+        - 浏览器桌面通知: `Notifications API`
+        - 消息管理
+## 进阶篇
+- 自动化测试: 每当添加一些新功能时,编写相应的测试来确保代码按照预期工作
+    - 认识自动化测试 (TDD:KISS+YAGNI)
+        - 单元测试UT: 单独的代码块测试
+        - 集成测试IT: 代码单位之间的协同工作进行测试
+        - 用户界面测试UIT: 测试复杂的页面交互
+    - Flask测试客户端：`client = app.test_client()`
+    - 使用unittest编写单元测试
+        - unittest
+            - Test Case : `unittest.TestCase`
+            - Test Fixture: `setUp()`+`tearDown()`
+            - Test Suite: 集合所有测试
+            - Test Runner
+        - Flask程序的测试固件
+        ```python
+        import unittest
+        from sayhello import app, db
+
+        class SayHelloTestCase(unittest.TestCase):
+            def setUp(self):
+                app.config.update(
+                    TESTING = True,
+                    WTF_CSRF_ENABLED = False,
+                    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory'
+                )
+                db.create_all()
+                self.client = app.test_client()
+
+            def tearDown(self):
+                db.session.remove()
+                db.drop_all()
+
+            def test_app_exist(self):
+                self.assertFalse(app is None)
+        ``` 
+        - 编写测试用例：`test_` + `assert`
+            - 为测试创建上下文: `test_request_context()` + `context.push()`
+            - 测试Web API: `client.post(url)`+`get_json()`
+            - 测试flask命令: `test_cli_runner()`+`runner.invoke(forge)`
+        - 组织测试
+        - 运行测试
+            - `unittest.main()`
+            - 自动发现测试: `python3 -m unittest discover -v`
+            - 通过setuptools运行测试: `python3 setup.py test`
+            - 运行Flask测试命令: `unittest.TestLoader().discover('tests')`
+    - 使用Selenium进行用户界面测试
+        - 安装浏览器与驱动
+        - 准备测试环境: 运行开发服务器
+            - 单独命令行窗口
+            - 新建后台线程
+            - `Flask-Testing`: `LiveServerTestCase`
+        - 编写测试代码
+            - 元素遮挡问题
+            - 元素引用失效
+            - 页面加载时间
+    - 使用Coverage.py计算测试覆盖率: 代码覆盖率工具
+        - 基本用法: `coverage run maths.py`
+        - 获取测试覆盖率: `coverage run --source=sayhello --branch -m unittest discover`
+    - 检查代码质量：`import this`
+        - Flake8
+        - Pylint
+    - 更多
+        - Web压力(负载)测试
+        - 浏览器兼容性测试
+        - Web漏洞扫描
+        - 持续集成CI:个人开发的部分向项目整体部分交付,频繁进行集成以便更快地发现其中的错误的过程
+            - 自己部署CI服务器:`Jenkins` `Bulidbot`
+            - CI云服务:`Circle` `Travis CI`
+- 性能优化
+    - 程序性能分析
+        - 函数性能分析: `Flask-DebugToolbar`
+            - 代码层面
+            - 异步任务: 高CPU消耗函数和耗时较长的任务
+                - Celery
+                - Redis-Queue
+        - 数据库查询分析：`get_debug_queries()`(`@app.after_app_request`)
+    - 使用Flask-Caching设置缓存: 服务器端
+        - 缓存视图函数: `@cache.cached(timeout)`
+        - 缓存其他函数: `@cache.cached(key_prefix=function)`
+        - 更新缓存: `cache.delete`
+        - 使用Redis作为缓存后端: `CACHE_TYPE = redis`
+        - 大型程序: CDN, 分布式缓存服务器
+    - 使用Flask-Assets优化静态资源
+        - 注册资源集: `Bundel()`
+        - 生成资源集文件: `flask assets build`
+        - 在模板中加载资源集: `{% assets "css_all" %} {{ ASSET_URL }}`
+- 部署上线
+    - 传统部署vs云部署
+        - IaaS
+            - Amazon EC2
+            - Google Compute Engine
+            - Microsoft Azure
+            - 阿里云ECS
+        - PaaS
+            - Heroku
+            - Google App Engine
+            - AWS Elastic Beanstalk
+            - PythonAnywhere
+            - Sina App Engine
+        - ps: 静态部署:`Frozen-Flask`
+    - 基本部署流程
+        - Git 
+            - 部署自动化: Server-Side Hooks
+        - Docker
+    - 部署前的准备
+        - 更新程序配置
+        - 创建生产环境专用的程序实例: `wsgi.py`
+        - 设置迁移工具: `Flask-Migrate`
+        - 程序日志
+            - 将日志写入文件: `logging.handlers.RotatingFileHandler`
+            - 云部署平台的日志
+            - 通过邮件发送关键日志
+            - 手动导入环境变量: `load_dotenv`
+            - HTTPS转发：`Flask-SSLify`
+    - 部署到Linux服务器
+        - 使用OpenSSH登陆远程主机
+        - 安装基本库和工具
+        - 安全防护措施
+            - 使用SSH密钥登陆
+            - 关闭密码登陆
+            - 设置防火墙: `sudo ufw allow 80`
+        - 推送代码并初始化程序环境
+        - 使用Gunicorn运行程序: `gunicorn --workers=4 wsgi:app`
+            - 异步(gevent): `gunicorn -k gevent`
+        - 使用Nginx提供反向代理
+        - 使用Supervisor管理进程
+        - 更新部署后的程序
+        - 部署到多个服务器:`Fabric` `SaltStack` `Ansible`
+    - 部署到PythonAnywhere
+        - 反向代理设置
+        - 创建PythonAnywhere程序
+        - 推送代码并初始化程序环境
+        - 创建数据库
+        - 设置虚拟环境
+        - 静态文件
+        - 运行和更新程序
+    - 部署到Heroku
+    - 下一步
+        - 搜索引擎优化SEO
+            - `<meta>`
+            - 提交网站,申请收录
+            - 站点地图`sitemap.xml`:`Flask-SiteMap`
+            - `robots.txt` vs `humans.txt`
+        - 用户体验优化UEO: `LightHouse`
+        - Web监控数据: `Icinga2` `Nagios` `DataDog`
+        - 收集用户数据: `Google Analytics` 百度统计 `Splunk`(日志分析)
+- Flask扩展开发
+    - 扩展的命名: `Flask-something`
+    - 扩展项目骨架: `PyPA`
+        - 程序包
+        - `setup.py`
+        - 实例程序
+        - 文档
+        - 测试脚本或包
+        - README
+        - LISCENCE
+        - CHANGES
+        - .gitignore
+    - 编写扩展类
+    - 添加扩展配置
+    - 实现扩展功能
+        - 加载静态资源
+        - 创建分享组件
+        - 在移动设备上隐藏
+    - 开源发布前的准备
+        - 添加文档字符串与注释
+        - 编写README和文档
+        - 为打包做准备
+            - 创建`setup.py`: `setup(**kw)`
+            - 添加包数据:`MANIFEST.in`
+        - 编写示例程序
+        - 编写单元测试: `setup.cfg`
+            - 简化测试流程: `Tox`
+    - 发布到PyPI
+        - 创建PyPI账号: `./pypirc`
+        - 使用setuptools打包: `Wheel` `Source Distribution`
+            - 生成dist文件: `python3 setup.py sdist bdist_wheel`
+        - 使用twine上传: `twine upload dist/*`
+    - 编写良好的扩展
+- Flask工作原理与机制解析
+    - 阅读Flask源码: 学习设计模式和代码组织方式, 了解功能的具体实现
+        - 获取Flask源码
+        - 如何阅读源码
+            - 立足整体
+            - 逐个击破
+            - 由简入繁
+            - 单步调试
+        - Flask发行版本分析: `0.1 0.4 0.5 0.7 1.0`
+    - Flask的设计理念
+        - "微"框架: Simple is better than complex
+        - 两个核心依赖: `Werkzeug`+`jinja2`
+        - 显式程序对象: Explicit is better than implict 
+        - 本地线程
+        - 三种程序状态
+            - 程序设置状态: `<LocalProxy unbound>`
+            - 程序运行状态: `<Flask '__main__'>`
+            - 请求运行状态: `<Request 'http://localhost/' [GET]>`
+        - 丰富的自定义支持: `Flask.request_class`
+    - Flask与WSGI
+        - WSGI程序: `environ`+`start_response`
+        - WSGI服务器: `make_server()`
+        - 中间件Middleware
+    - Flask的工作流程与机制
+        - Flask中的请求响应循环
+            - 程序启动: `werkzeug.serving.run_simple()`
+            - 请求In: `Flask.wsgi_app()`
+            - 响应Out: `Flask.finalize_request()`
+        - 路由系统
+            - 注册路由: `url_map` + `view_functions`
+            - URL匹配: `Map.bind()`
+        - 本地上下文: `request->Request` `session->SecureCookieSession` `current_app->Flask` `g->_APPCtxGlobals`
+            - 本地线程与Local: 线程ID `werkzeug.local.Local()`
+            - 堆栈与LocalStack: `_request_ctx_stack` `_app_ctx_stack`
+            - 代理与LocalProxy: 动态的方式获取被代理的实际对象`_get_current_object()`
+            - 请求上下文: `RequestContext`
+            - 程序上下文: `AppContext`
+        - 请求与响应对象
+            - 请求对象: `request_class`
+            - 响应对象: `response_class`
+        - session: “session变量/对象”来操作“用户会话(Session)”, 把用户会话保存在“一块名/键为session的cookie”中
+            - 操作session
+            - session起源
+            - 用户会话存储在服务端(客户端存储session ID):`Flask-Session`
+        - 蓝本: 一个休眠的操作子集,只有注册到程序上才会获得生命 `Blueprint.record()`
+        - 模板渲染: `update_template_context()`
